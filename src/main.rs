@@ -1,6 +1,7 @@
 use clap::Parser;
 
 pub mod config;
+pub mod spl_token_manage;
 pub mod wallet_manage;
 
 #[derive(Parser, Debug)]
@@ -9,6 +10,9 @@ enum Commands {
     /// Manage wallet
     #[command(subcommand)]
     Wallet(wallet_manage::WalletMange),
+    /// Spl token manage
+    #[command(subcommand)]
+    SplToken(spl_token_manage::SplTokenMange),
 }
 
 impl Commands {
@@ -16,6 +20,9 @@ impl Commands {
         match self {
             Commands::Wallet(wallet_manage) => {
                 wallet_manage::handle_wallet_manage(wallet_manage).await
+            }
+            Commands::SplToken(spl_token_manage) => {
+                spl_token_manage::handle_spl_token_manage(spl_token_manage).await
             }
         }
     }
