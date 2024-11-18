@@ -1,3 +1,4 @@
+use console::style;
 use solana_client::nonblocking::rpc_client::RpcClient;
 use solana_sdk::signer::Signer;
 use solana_sdk::{native_token::Sol, pubkey::Pubkey};
@@ -9,7 +10,13 @@ async fn check_balance(address: &str) -> anyhow::Result<()> {
     let balance = client.get_balance(&pubkey).await?;
     let lamports = Sol(balance);
 
-    println!("Balance for {}: {}", address, lamports);
+    println!(
+        "{} {}: {} {}",
+        style("Balance for").cyan(),
+        style(pubkey).yellow(),
+        style(lamports).green().bold(),
+        style("SOL").cyan()
+    );
     Ok(())
 }
 
