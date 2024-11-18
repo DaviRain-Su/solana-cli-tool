@@ -1,5 +1,6 @@
 use clap::Parser;
 
+pub mod balance;
 pub mod new_wallet;
 pub mod recover_private_key;
 
@@ -56,8 +57,7 @@ pub async fn handle_wallet_manage(wallet_manage: &WalletMange) -> anyhow::Result
             Ok(())
         }
         WalletMange::Balance { address } => {
-            println!("Check wallet balance: {:?}", address);
-            Ok(())
+            balance::display_balance(address.as_ref().map(|x| x.as_str())).await
         }
         WalletMange::Transfer { from, to, amount } => {
             println!("Transfer SOL from {} to {} amount: {}", from, to, amount);
