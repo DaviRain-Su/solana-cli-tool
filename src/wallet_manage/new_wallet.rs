@@ -1,5 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
+use console::{style, Emoji};
 use solana_sdk::signature::{Keypair, Signer};
 
 #[derive(Parser, Debug)]
@@ -12,6 +13,17 @@ pub struct NewWalletArgs {
 pub fn create_new_wallet(args: &NewWalletArgs) -> Result<()> {
     let keypair = Keypair::new();
     let pubkey = keypair.pubkey();
+    // 使用不同颜色和样式
+    println!(
+        "{} {}",
+        style("Your new wallet address is:").cyan().bold(),
+        style(pubkey).green()
+    );
+
+    // 使用 emoji
+    static WALLET: Emoji<'_, '_> = Emoji("💳 ", "");
+    static SAVE: Emoji<'_, '_> = Emoji("💾 ", "");
+
     let keypair_file = args
         .keypair_file
         .clone()
@@ -21,13 +33,23 @@ pub fn create_new_wallet(args: &NewWalletArgs) -> Result<()> {
     let home_dir = dirs::home_dir().expect("Could not find home directory");
     let keypair_path = home_dir.join(".config").join("solana").join(&keypair_file);
 
+    println!("{} Created new wallet", WALLET);
+    println!(
+        "{} Saving keypair to {}",
+        SAVE,
+        style(keypair_path.display()).yellow()
+    );
+
     // Create directories if they don't exist
     std::fs::create_dir_all(keypair_path.parent().unwrap())?;
 
-    println!("Your new wallet address is: {}", pubkey);
-    println!("Saving keypair to {:?}", keypair_path);
-
     write_keypair_file(&keypair, &keypair_path.to_str().unwrap())?;
+    // 可以添加成功标记
+    println!(
+        "{} {}",
+        style("✔").green(),
+        style("Wallet created successfully!").green().bold()
+    );
     Ok(())
 }
 
