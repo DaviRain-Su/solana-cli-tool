@@ -3,6 +3,7 @@ use clap::Parser;
 pub mod balance;
 pub mod new_wallet;
 pub mod recover_private_key;
+pub mod transfer;
 
 #[derive(Parser, Debug)]
 pub enum WalletMange {
@@ -24,18 +25,12 @@ pub enum WalletMange {
         address: Option<String>,
     },
     /// Transfer SOL
-    Transfer {
-        #[clap(short, long)]
-        from: String,
-        #[clap(short, long)]
-        to: String,
-        #[clap(short, long)]
-        amount: f64,
-    },
+    Transfer(transfer::TransferArgs),
     /// Transfer SPL token
     TransferToken {
+        /// Sender wallet address, if it is not provided, the default wallet will be used
         #[clap(short, long)]
-        from: String,
+        from: Option<String>,
         #[clap(short, long)]
         to: String,
         #[clap(short, long)]
@@ -43,6 +38,8 @@ pub enum WalletMange {
         #[clap(short, long)]
         token: String,
     },
+    /// Show current configuration
+    Config,
 }
 
 pub async fn handle_wallet_manage(wallet_manage: &WalletMange) -> anyhow::Result<()> {
@@ -59,10 +56,7 @@ pub async fn handle_wallet_manage(wallet_manage: &WalletMange) -> anyhow::Result
         WalletMange::Balance { address } => {
             balance::display_balance(address.as_ref().map(|x| x.as_str())).await
         }
-        WalletMange::Transfer { from, to, amount } => {
-            println!("Transfer SOL from {} to {} amount: {}", from, to, amount);
-            Ok(())
-        }
+        WalletMange::Transfer(arg) => transfer::transfer_sol(arg).await,
         WalletMange::TransferToken {
             from,
             to,
@@ -70,10 +64,11 @@ pub async fn handle_wallet_manage(wallet_manage: &WalletMange) -> anyhow::Result
             token,
         } => {
             println!(
-                "Transfer SPL token from {} to {} amount: {} token: {}",
+                "Transfer SPL token from {:?} to {} amount: {} token: {}",
                 from, to, amount, token
             );
             Ok(())
         }
+        WalletMange::Config => crate::config::show_config(),
     }
 }

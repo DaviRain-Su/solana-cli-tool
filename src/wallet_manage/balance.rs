@@ -1,11 +1,11 @@
+use crate::config::get_rpc_client;
 use console::style;
-use solana_client::nonblocking::rpc_client::RpcClient;
 use solana_sdk::signer::Signer;
 use solana_sdk::{native_token::Sol, pubkey::Pubkey};
 use std::str::FromStr;
 
 async fn check_balance(address: &str) -> anyhow::Result<()> {
-    let client = RpcClient::new("https://api.mainnet-beta.solana.com".to_string()); // Use the appropriate network
+    let client = get_rpc_client()?;
     let pubkey = Pubkey::from_str(&address)?;
     let balance = client.get_balance(&pubkey).await?;
     let lamports = Sol(balance);
