@@ -46,7 +46,6 @@ pub async fn handle_wallet_manage(wallet_manage: &WalletMange) -> anyhow::Result
     match wallet_manage {
         WalletMange::NewWallet(args) => new_wallet::create_new_wallet(args),
         WalletMange::RecoverPrivateKey { private_key } => {
-            println!("Recover wallet from private key: {}", private_key);
             recover_private_key::recover_from_private_key(private_key)
         }
         WalletMange::RecoverWallet { mnemonic } => {
