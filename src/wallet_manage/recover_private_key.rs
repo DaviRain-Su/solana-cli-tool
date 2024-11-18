@@ -1,11 +1,19 @@
 use super::new_wallet::write_keypair_file;
+use clap::Parser;
 use console::{style, Emoji};
 use solana_sdk::signature::{Keypair, Signer};
 
+/// recover wallet from base58 encoded private key
+#[derive(Debug, Parser)]
+pub struct RecoverPrivateKeyArgs {
+    #[clap(short, long)]
+    private_key: String,
+}
+
 // 在 wallet_manage.rs 中添加处理函数
-pub fn recover_from_private_key(private_key: &str) -> anyhow::Result<()> {
+pub fn recover_from_private_key(args: &RecoverPrivateKeyArgs) -> anyhow::Result<()> {
     // 创建 Keypair
-    let keypair = Keypair::from_base58_string(&private_key);
+    let keypair = Keypair::from_base58_string(&args.private_key);
     let pubkey = keypair.pubkey();
 
     // 使用不同颜色和样式

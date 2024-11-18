@@ -4,6 +4,12 @@ use solana_sdk::signer::Signer;
 use solana_sdk::{native_token::Sol, pubkey::Pubkey};
 use std::str::FromStr;
 
+#[derive(Debug, clap::Parser)]
+pub struct BalanceArgs {
+    #[clap(short, long)]
+    address: Option<String>,
+}
+
 async fn check_balance(address: &str) -> anyhow::Result<()> {
     let client = get_rpc_client()?;
     let pubkey = Pubkey::from_str(&address)?;
@@ -20,8 +26,8 @@ async fn check_balance(address: &str) -> anyhow::Result<()> {
     Ok(())
 }
 
-pub async fn display_balance(address: Option<&str>) -> anyhow::Result<()> {
-    if let Some(address) = address {
+pub async fn display_balance(args: &BalanceArgs) -> anyhow::Result<()> {
+    if let Some(address) = args.address.as_ref() {
         check_balance(&address).await
     } else {
         check_default_balance().await

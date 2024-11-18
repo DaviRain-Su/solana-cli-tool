@@ -15,15 +15,9 @@ pub enum WalletMange {
         mnemonic: String,
     },
     /// recover wallet from base58 encoded private key
-    RecoverPrivateKey {
-        #[clap(short, long)]
-        private_key: String,
-    },
+    RecoverPrivateKey(recover_private_key::RecoverPrivateKeyArgs),
     /// Check wallet balance
-    Balance {
-        #[clap(short, long)]
-        address: Option<String>,
-    },
+    Balance(balance::BalanceArgs),
     /// Transfer SOL
     Transfer(transfer::TransferArgs),
     /// Transfer SPL token
@@ -45,16 +39,12 @@ pub enum WalletMange {
 pub async fn handle_wallet_manage(wallet_manage: &WalletMange) -> anyhow::Result<()> {
     match wallet_manage {
         WalletMange::NewWallet(args) => new_wallet::create_new_wallet(args),
-        WalletMange::RecoverPrivateKey { private_key } => {
-            recover_private_key::recover_from_private_key(private_key)
-        }
+        WalletMange::RecoverPrivateKey(args) => recover_private_key::recover_from_private_key(args),
         WalletMange::RecoverWallet { mnemonic } => {
             println!("Recover wallet from mnemonic: {}", mnemonic);
             Ok(())
         }
-        WalletMange::Balance { address } => {
-            balance::display_balance(address.as_ref().map(|x| x.as_str())).await
-        }
+        WalletMange::Balance(args) => balance::display_balance(args).await,
         WalletMange::Transfer(arg) => transfer::transfer_sol(arg).await,
         WalletMange::TransferToken {
             from,
