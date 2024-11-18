@@ -1,5 +1,6 @@
 use clap::Parser;
 
+pub mod account_create_timestamp;
 pub mod balance;
 pub mod new_wallet;
 pub mod recover_private_key;
@@ -32,6 +33,8 @@ pub enum WalletMange {
         #[clap(short, long)]
         token: String,
     },
+    /// Get account create timestamp
+    AccountCreateTimestamp(account_create_timestamp::AccountCreateTimestampArgs),
     /// Show current configuration
     Config,
 }
@@ -56,6 +59,11 @@ pub async fn handle_wallet_manage(wallet_manage: &WalletMange) -> anyhow::Result
                 "Transfer SPL token from {:?} to {} amount: {} token: {}",
                 from, to, amount, token
             );
+            Ok(())
+        }
+        WalletMange::AccountCreateTimestamp(args) => {
+            //println!("Get account create timestamp for address: {}", address);
+            account_create_timestamp::handle_account_create_timestamp(args).await?;
             Ok(())
         }
         WalletMange::Config => crate::config::show_config(),

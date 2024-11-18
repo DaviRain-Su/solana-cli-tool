@@ -3408,10 +3408,12 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "bs58",
+ "chrono",
  "clap",
  "console",
  "dirs",
  "env_logger",
+ "futures",
  "log",
  "serde",
  "serde_yaml",
