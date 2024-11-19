@@ -1,7 +1,7 @@
 use anyhow::Result;
 use clap::Parser;
 use console::{style, Emoji};
-use solana_sdk::signature::{Keypair, Signer};
+use solana_sdk::signature::{write_keypair, Keypair, Signer};
 
 #[derive(Parser, Debug)]
 pub struct NewWalletArgs {
@@ -55,12 +55,9 @@ pub fn create_new_wallet(args: &NewWalletArgs) -> Result<()> {
 
 pub fn write_keypair_file(keypair: &Keypair, filename: &str) -> Result<()> {
     use std::fs::File;
-    use std::io::Write;
 
     let mut file = File::create(filename)?;
-    let secret_key_str = keypair.to_base58_string();
-    // Create JSON structure
-    let json_content = format!(r#"[{secret_key_str}]"#);
-    file.write_all(&json_content.as_bytes())?;
+    let serde_keypair = write_keypair(keypair, &mut file);
+    println!("serde_keypair: {:?}", serde_keypair);
     Ok(())
 }

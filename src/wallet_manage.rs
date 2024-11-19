@@ -2,6 +2,7 @@ use clap::Parser;
 
 pub mod account_create_timestamp;
 pub mod balance;
+pub mod list_wallets;
 pub mod new_wallet;
 pub mod recover_private_key;
 pub mod transfer;
@@ -35,6 +36,8 @@ pub enum WalletMange {
     },
     /// Get account create timestamp
     AccountCreateTimestamp(account_create_timestamp::AccountCreateTimestampArgs),
+    /// list all wallets
+    ListWallets,
     /// Show current configuration
     Config,
 }
@@ -64,6 +67,11 @@ pub async fn handle_wallet_manage(wallet_manage: &WalletMange) -> anyhow::Result
         WalletMange::AccountCreateTimestamp(args) => {
             //println!("Get account create timestamp for address: {}", address);
             account_create_timestamp::handle_account_create_timestamp(args).await?;
+            Ok(())
+        }
+        WalletMange::ListWallets => {
+            println!("List all wallets");
+            list_wallets::list_all_wallets()?;
             Ok(())
         }
         WalletMange::Config => crate::config::show_config(),

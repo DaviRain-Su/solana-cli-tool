@@ -3416,6 +3416,7 @@ dependencies = [
  "futures",
  "log",
  "serde",
+ "serde_json",
  "serde_yaml",
  "solana-client",
  "solana-sdk",
