@@ -42,7 +42,7 @@ pub fn restore_wallet(args: &RestoreWalletArgs) -> anyhow::Result<()> {
     std::fs::create_dir_all(keypair_path.parent().unwrap())?;
 
     println!("Restored wallet address: {}", pubkey);
-    write_keypair_file(&keypair, "restored_wallet.json")?;
+    write_keypair_file(&keypair, &keypair_path.display().to_string())?;
     Ok(())
 }
 
