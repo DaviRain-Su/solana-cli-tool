@@ -1,4 +1,5 @@
 use crate::config::get_rpc_client;
+use crate::utils::default_account;
 use clap::Parser;
 use console::style;
 use solana_client::nonblocking::rpc_client::RpcClient;
@@ -59,18 +60,7 @@ pub async fn handle_get_balance(args: &GetBalanceArgs) -> anyhow::Result<()> {
 }
 
 async fn check_default_balance(client: &RpcClient, mint_id: &Pubkey) -> anyhow::Result<()> {
-    // default address at ~/.config/solana/id.json
-    // 构造保存路径
-    let home_dir = dirs::home_dir().expect("Could not find home directory");
-    let keypair_path = home_dir
-        .join(".config")
-        .join("solana")
-        .join(format!("id.json"));
-
-    // read keypair from file
-    let keypair = solana_sdk::signature::read_keypair_file(&keypair_path.to_str().unwrap())
-        .map_err(|e| anyhow::anyhow!("{}", e.to_string()))?;
-
+    let keypair = default_account()?;
     let target: Pubkey = keypair.pubkey();
     let addr = spl_associated_token_account::get_associated_token_address(&target, &mint_id);
     let balance = client.get_token_account_balance(&addr).await?;

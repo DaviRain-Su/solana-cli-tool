@@ -1,4 +1,5 @@
 use crate::config::get_rpc_client;
+use crate::utils::default_account;
 use chrono::prelude::*;
 use clap::Parser;
 use console::style;
@@ -46,17 +47,7 @@ pub async fn handle_account_create_timestamp(
 }
 
 async fn check_default_timestamp(client: &RpcClient) -> anyhow::Result<()> {
-    // default address at ~/.config/solana/id.json
-    // 构造保存路径
-    let home_dir = dirs::home_dir().expect("Could not find home directory");
-    let keypair_path = home_dir
-        .join(".config")
-        .join("solana")
-        .join(format!("id.json"));
-
-    // read keypair from file
-    let keypair = solana_sdk::signature::read_keypair_file(&keypair_path.to_str().unwrap())
-        .map_err(|e| anyhow::anyhow!("{}", e.to_string()))?;
+    let keypair = default_account()?;
 
     let datetime = get_account_creation_date(&client, &keypair.pubkey()).await?;
     let timestamp_str = datetime.format("%Y-%m-%d %H:%M:%S").to_string();

@@ -2,6 +2,7 @@ use clap::Parser;
 
 pub mod config;
 pub mod spl_token_manage;
+pub mod utils;
 pub mod wallet_manage;
 
 #[derive(Parser, Debug)]
