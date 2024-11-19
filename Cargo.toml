@@ -20,5 +20,7 @@ serde_yaml = "0.9.34"
 sha2 = "0.10.8"
 solana-client = "2.1.1"
 solana-sdk = "2.1.1"
+solana-transaction-status-client-types = "2.1.1"
 spl-associated-token-account = "6.0.0"
+spl-token = "7.0.0"
 tokio = { version = "1.41.1", features = ["full"] }

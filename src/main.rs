@@ -1,6 +1,7 @@
 use clap::Parser;
 
 pub mod config;
+pub mod monitor;
 pub mod spl_token_manage;
 pub mod utils;
 pub mod wallet_manage;
@@ -14,6 +15,8 @@ enum Commands {
     /// Spl token manage
     #[command(subcommand)]
     SplToken(spl_token_manage::SplTokenMange),
+    /// monitor
+    Monitor(monitor::MonitorArgs),
 }
 
 impl Commands {
@@ -25,6 +28,7 @@ impl Commands {
             Commands::SplToken(spl_token_manage) => {
                 spl_token_manage::handle_spl_token_manage(spl_token_manage).await
             }
+            Commands::Monitor(monitor_args) => monitor::run_monitor(monitor_args).await,
         }
     }
 }
