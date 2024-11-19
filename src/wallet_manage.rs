@@ -4,6 +4,7 @@ pub mod account_create_timestamp;
 pub mod balance;
 pub mod list_wallets;
 pub mod new_wallet;
+pub mod recover;
 pub mod recover_private_key;
 pub mod transfer;
 
