@@ -14,6 +14,19 @@ pub struct SolanaConfig {
     commitment: String,
 }
 
+impl SolanaConfig {
+    pub fn get_api_key(&self) -> String {
+        // split string by "api-key=" and take the second part
+        // split self.json_rpc_url by "api-key=" and take the second part
+        self.json_rpc_url
+            .split("api-key=")
+            .collect::<Vec<&str>>()
+            .get(1)
+            .unwrap()
+            .to_string()
+    }
+}
+
 fn get_config_file() -> Result<PathBuf> {
     let home_dir =
         dirs::home_dir().ok_or_else(|| anyhow::anyhow!("Could not find home directory"))?;
