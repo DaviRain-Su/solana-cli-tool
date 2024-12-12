@@ -5,6 +5,8 @@ use {
     anyhow::{Result, anyhow},
     serde::{Deserialize, Serialize},
     futures::StreamExt,
+    tokio::time::sleep,
+    std::time::Duration,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -37,6 +39,7 @@ pub enum TransactionUpdate {
 pub struct WebSocketMonitor {
     client: PubsubClient,
     commitment: CommitmentConfig,
+    websocket_url: String,
 }
 
 impl WebSocketMonitor {
@@ -46,29 +49,50 @@ impl WebSocketMonitor {
         Ok(Self {
             client,
             commitment: CommitmentConfig::finalized(),
+            websocket_url: websocket_url.to_string(),
         })
     }
 
-    /// Returns the current commitment configuration
-    pub fn commitment(&self) -> CommitmentConfig {
-        self.commitment
+    /// Attempts to reconnect to the WebSocket server
+    async fn reconnect(&mut self) -> Result<()> {
+        self.client = PubsubClient::new(&self.websocket_url).await?;
+        Ok(())
     }
 
-    /// Sets a new commitment configuration
-    pub fn set_commitment(&mut self, commitment: CommitmentConfig) {
-        self.commitment = commitment;
+    /// Handles WebSocket connection errors with automatic reconnection attempts
+    pub async fn handle_connection_error(&mut self) -> Result<()> {
+        println!("⚠️ WebSocket connection lost. Attempting to reconnect...");
+        let mut retries = 0;
+        while retries < 3 {
+            if self.reconnect().await.is_ok() {
+                println!("✅ Successfully reconnected");
+                return Ok(());
+            }
+            retries += 1;
+            println!("🔄 Retry attempt {} of 3", retries);
+            sleep(Duration::from_secs(2)).await;
+        }
+        Err(anyhow!("Failed to reconnect after 3 attempts"))
     }
 
     /// Subscribes to account updates for the specified public key
     pub async fn monitor_account(&self, pubkey: &Pubkey) -> Result<broadcast::Receiver<AccountUpdate>> {
-        let (subscription, mut receiver) = self.client
+        let (subscription, mut receiver) = match self.client
             .account_subscribe(
                 pubkey,
                 Some(self.commitment),
             )
-            .await?;
+            .await
+        {
+            Ok(result) => result,
+            Err(e) => {
+                println!("❌ Failed to subscribe to account updates: {}", e);
+                return Err(anyhow!("Failed to subscribe: {}", e));
+            }
+        };
 
         let (tx, rx) = broadcast::channel(100);
+        let mut monitor = self.clone();
 
         tokio::spawn(async move {
             while let Some(response) = receiver.next().await {
@@ -86,7 +110,9 @@ impl WebSocketMonitor {
                     }
                     Err(err) => {
                         let _ = tx.send(AccountUpdate::Error(err.to_string()));
-                        break;
+                        if monitor.handle_connection_error().await.is_err() {
+                            break;
+                        }
                     }
                 }
             }
@@ -102,15 +128,23 @@ impl WebSocketMonitor {
             enable_received_notification: Some(true),
         };
 
-        let (subscription, mut receiver) = self.client
+        let (subscription, mut receiver) = match self.client
             .signature_subscribe(
                 signature,
                 Some(config),
             )
-            .await?;
+            .await
+        {
+            Ok(result) => result,
+            Err(e) => {
+                println!("❌ Failed to subscribe to signature updates: {}", e);
+                return Err(anyhow!("Failed to subscribe: {}", e));
+            }
+        };
 
         let (tx, rx) = broadcast::channel(100);
         let signature_str = signature.to_string();
+        let mut monitor = self.clone();
 
         tokio::spawn(async move {
             while let Some(response) = receiver.next().await {
@@ -133,7 +167,9 @@ impl WebSocketMonitor {
                     }
                     Err(err) => {
                         let _ = tx.send(TransactionUpdate::Error(err.to_string()));
-                        break;
+                        if monitor.handle_connection_error().await.is_err() {
+                            break;
+                        }
                     }
                 }
             }
