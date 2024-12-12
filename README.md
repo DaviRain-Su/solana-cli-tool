@@ -1,5 +1,7 @@
 # Solana cli tool
 
+> Note: This project is under active development. Some features are implemented while others are still in progress.
+
 ### 功能考虑
 
 1. **钱包管理**:
