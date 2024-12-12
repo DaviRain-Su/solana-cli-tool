@@ -15,8 +15,9 @@ enum Commands {
     /// Spl token manage
     #[command(subcommand)]
     SplToken(spl_token_manage::SplTokenMange),
-    /// monitor
-    Monitor(monitor::MonitorArgs),
+    /// Monitor wallet activities in real-time
+    #[command(subcommand)]
+    Monitor(monitor::MonitorCommand),
 }
 
 impl Commands {
@@ -28,7 +29,7 @@ impl Commands {
             Commands::SplToken(spl_token_manage) => {
                 spl_token_manage::handle_spl_token_manage(spl_token_manage).await
             }
-            Commands::Monitor(monitor_args) => monitor::run_monitor(monitor_args).await,
+            Commands::Monitor(cmd) => monitor::handle_monitor(cmd).await,
         }
     }
 }
