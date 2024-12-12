@@ -1,9 +1,8 @@
 use anyhow::Result;
-use clap::Parser;
 use console::style;
+use solana_sdk::transaction::Transaction;
 use solana_sdk::{pubkey::Pubkey, signature::read_keypair_file, signer::Signer};
 use spl_associated_token_account::get_associated_token_address;
-use solana_sdk::transaction::Transaction;
 use std::str::FromStr;
 
 use crate::config::get_rpc_client;
@@ -33,7 +32,8 @@ pub async fn handle_transfer_token(args: &TransferTokenArgs) -> Result<()> {
 
     // Get source keypair (default or specified)
     let source_keypair = match &args.source {
-        Some(key) => read_keypair_file(key).map_err(|e| anyhow::anyhow!("Failed to read keypair file: {}", e))?,
+        Some(key) => read_keypair_file(key)
+            .map_err(|e| anyhow::anyhow!("Failed to read keypair file: {}", e))?,
         None => default_account()?,
     };
 

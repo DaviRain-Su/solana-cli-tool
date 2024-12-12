@@ -1,4 +1,4 @@
-se crate::config::get_rpc_client;
+use crate::config::get_rpc_client;
 use crate::utils::default_account;
 use console::style;
 use solana_sdk::signer::Signer;
