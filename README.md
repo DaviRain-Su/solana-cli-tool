@@ -9,7 +9,7 @@
   - [ ] Recover wallet via mnemonic (恢复钱包（通过助记词）)
   - [x] Display wallet balance (显示钱包余额)
   - [x] Transfer SOL (转移SOL)
-  - [ ] Transfer SPL tokens (转移SPL代币)
+  - [x] Transfer SPL tokens (转移SPL代币)
 
 2. **Transaction Operations (交易操作)**:
   - [ ] Send transaction (发送交易)
