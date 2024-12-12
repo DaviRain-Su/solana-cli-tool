@@ -2,6 +2,7 @@ use clap::Parser;
 
 pub mod account_create_timestamp;
 pub mod balance;
+pub mod display_private_key;
 pub mod list_wallets;
 pub mod new_wallet;
 pub mod recover;
@@ -39,6 +40,8 @@ pub enum WalletMange {
     AccountCreateTimestamp(account_create_timestamp::AccountCreateTimestampArgs),
     /// list all wallets
     ListWallets,
+    // Display Wallet Private Key
+    DisplayWalletPrivateKey(display_private_key::DisplayPrivateKeyArgs),
     /// Show current configuration
     Config,
 }
@@ -74,6 +77,9 @@ pub async fn handle_wallet_manage(wallet_manage: &WalletMange) -> anyhow::Result
             println!("List all wallets");
             list_wallets::list_all_wallets()?;
             Ok(())
+        }
+        WalletMange::DisplayWalletPrivateKey(args) => {
+            display_private_key::display_private_key(args)
         }
         WalletMange::Config => crate::config::show_config(),
     }
